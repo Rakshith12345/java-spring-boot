@@ -1,0 +1,7 @@
+com\example\employeedemo\config\CorsConfig$1.class
+com\example\employeedemo\EmployeeDemoApplication.class
+com\example\employeedemo\entity\Employee.class
+com\example\employeedemo\service\EmployeeService.class
+com\example\employeedemo\controller\EmployeeController.class
+com\example\employeedemo\repository\EmployeeRepository.class
+com\example\employeedemo\config\CorsConfig.class
