@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION   = 'ap-south-1'
+        ECR_URI      = '908027375897.dkr.ecr.ap-south-1.amazonaws.com/java-backend'
+        CLUSTER_NAME = 'my-cluster'
+        NAMESPACE    = 'backend'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Rakshith12345/java-spring-boot.git'
+            }
+        }
+
+        stage('Build Maven Project') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def COMMIT_HASH = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    env.IMAGE_TAG = "${COMMIT_HASH}-${env.BUILD_NUMBER}"
+                    sh "docker build -t ${ECR_URI}:${IMAGE_TAG} ."
+                    sh "docker tag ${ECR_URI}:${IMAGE_TAG} ${ECR_URI}:latest"
+                }
+            }
+        }
+
+        stage('Login & Push to ECR') {
+            steps {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']
+                ]) {
+                    sh """
+                        aws ecr get-login-password --region ${AWS_REGION} \
+                            | docker login --username AWS --password-stdin ${ECR_URI}
+                        docker push ${ECR_URI}:${IMAGE_TAG}
+                        docker push ${ECR_URI}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to EKS') {
+            steps {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']
+                ]) {
+                    sh """
+                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+                        kubectl set image deployment/backend-deployment \
+                            backend-container=${ECR_URI}:${IMAGE_TAG} -n ${NAMESPACE}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Successfully deployed image tag: ${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check the Jenkins logs for errors."
+        }
+    }
+}
