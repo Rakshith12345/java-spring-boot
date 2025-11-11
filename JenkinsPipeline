@@ -62,12 +62,14 @@ pipeline {
         }
     }
 
+
     post {
         success {
             echo "✅ Successfully deployed image tag: ${IMAGE_TAG}"
         }
         failure {
             echo "❌ Pipeline failed. Check the Jenkins logs for errors."
+            sh "kubectl rollout undo deployment/backend-deployment -n backend"
         }
     }
 }
