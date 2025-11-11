@@ -1,6 +1,6 @@
 Go to your job → Configure
 
-Check ✅ “Discard old build”
+Check ✅ “Discard old builds”
 
 Set:
 
