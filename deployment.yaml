@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: backend
+  labels:
+    app: backend-springboot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend-springboot
+  template:
+    metadata:
+      labels:
+        app: backend-springboot
+    spec:
+      containers:
+        - name: backend-container
+          image: rakshithraghu/java-backend-8080:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BACKEND_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: java-db-secret
+                  key: BACKEND_USERNAME
+            - name: BACKEND_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: java-db-secret
+                  key: BACKEND_PASSWORD
+            - name: BACKEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: java-db-secret
+                  key: BACKEND_URL
+            - name: SERVER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: java-db-secret
+                  key: SERVER_PORT
