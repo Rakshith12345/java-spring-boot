@@ -1,0 +1,4 @@
+Roll back to previous	kubectl rollout undo deployment/backend-deployment -n backend
+Check status	kubectl rollout status deployment/backend-deployment -n backend
+See history	kubectl rollout history deployment/backend-deployment -n backend
+Roll back to specific version	kubectl rollout undo deployment/backend-deployment --to-revision=<num> -n backend
