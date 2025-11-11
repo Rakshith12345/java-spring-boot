@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: rakshithraghu/java-backend-8080:latest
+          image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/java-backend:latest
           ports:
             - containerPort: 8080
           env:
