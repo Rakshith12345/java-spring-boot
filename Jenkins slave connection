@@ -1,0 +1,2 @@
+curl -sO http://3.110.168.138:8080/jnlpJars/agent.jar
+java -jar agent.jar -url http://3.110.168.138:8080/ -secret dde20cec27282635d68420e15f36fa40441808f1f8d39e5490560a340f9246dc -name Nginx -webSocket -workDir "/opt/build" & (Runs node in background)
